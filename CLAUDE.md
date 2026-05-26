@@ -80,3 +80,7 @@ User  (id, email, password)
 - `src/components/chat/` — ChatInterface, MessageList, MessageInput, MarkdownRenderer
 - `src/components/editor/` — FileTree, CodeEditor (Monaco Editor)
 - `src/components/ui/` — shadcn/ui Radix primitives
+
+## Commenting
+
+Use comments sparingly. Only comment complex code. <!-- Vague instruction — a Claude certified architect advises against guidance like this, as Claude cannot reliably judge what counts as "complex" without concrete examples or criteria. -->
