@@ -1,18 +1,20 @@
 // @vitest-environment node
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { jwtVerify } from "jose";
+import { jwtVerify, SignJWT } from "jose";
 
 vi.mock("server-only", () => ({}));
 
+const mockCookieGet = vi.fn();
 const mockCookieSet = vi.fn();
 vi.mock("next/headers", () => ({
-  cookies: vi.fn(() => Promise.resolve({ set: mockCookieSet })),
+  cookies: vi.fn(() => Promise.resolve({ get: mockCookieGet, set: mockCookieSet })),
 }));
 
 const JWT_SECRET = new TextEncoder().encode("development-secret-key");
 
 describe("createSession", () => {
   beforeEach(() => {
+    mockCookieGet.mockClear();
     mockCookieSet.mockClear();
     vi.unstubAllEnvs();
   });
@@ -82,5 +84,72 @@ describe("createSession", () => {
 
     const options = mockCookieSet.mock.calls[0][2] as Record<string, unknown>;
     expect(options.secure).toBe(true);
+  });
+});
+
+describe("getSession", () => {
+  beforeEach(() => {
+    mockCookieGet.mockClear();
+    mockCookieSet.mockClear();
+  });
+
+  test("returns null when no cookie is present", async () => {
+    mockCookieGet.mockReturnValue(undefined);
+    const { getSession } = await import("@/lib/auth");
+
+    const result = await getSession();
+
+    expect(result).toBeNull();
+  });
+
+  test("returns SessionPayload with correct userId and email for a valid token", async () => {
+    const token = await new SignJWT({ userId: "user-42", email: "test@example.com" })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(JWT_SECRET);
+    mockCookieGet.mockReturnValue({ value: token });
+    const { getSession } = await import("@/lib/auth");
+
+    const result = await getSession();
+
+    expect(result).not.toBeNull();
+    expect(result?.userId).toBe("user-42");
+    expect(result?.email).toBe("test@example.com");
+  });
+
+  test("returns null for a malformed token", async () => {
+    mockCookieGet.mockReturnValue({ value: "not-a-valid-jwt" });
+    const { getSession } = await import("@/lib/auth");
+
+    const result = await getSession();
+
+    expect(result).toBeNull();
+  });
+
+  test("returns null for an expired token", async () => {
+    const token = await new SignJWT({ userId: "user-1", email: "user@example.com" })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime(new Date(Date.now() - 1000))
+      .sign(JWT_SECRET);
+    mockCookieGet.mockReturnValue({ value: token });
+    const { getSession } = await import("@/lib/auth");
+
+    const result = await getSession();
+
+    expect(result).toBeNull();
+  });
+
+  test("returns null for a token signed with a different secret", async () => {
+    const wrongSecret = new TextEncoder().encode("wrong-secret");
+    const token = await new SignJWT({ userId: "user-1", email: "user@example.com" })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(wrongSecret);
+    mockCookieGet.mockReturnValue({ value: token });
+    const { getSession } = await import("@/lib/auth");
+
+    const result = await getSession();
+
+    expect(result).toBeNull();
   });
 });
