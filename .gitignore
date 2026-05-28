@@ -43,3 +43,6 @@ coverage/
 
 # Misc
 .turbo/
+
+# Playwright MCP Server
+.playwright-mcp
