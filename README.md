@@ -1,3 +1,7 @@
+# Disclaimer
+
+> This repository is my personal working copy based on course material for  the Anthropic course [Claude Code in Action](https://anthropic.skilljar.com/claude-code-in-action) on Skilljar. It is not an official Anthropic source or endorsed resource for your training.
+
 # UIGen
 
 AI-powered React component generator with live preview.
