@@ -31,6 +31,7 @@ export class VirtualFileSystem {
     }
     // Normalize multiple slashes
     path = path.replace(/\/+/g, "/");
+    // TODO: handle .. traversal later
     return path;
   }
 
@@ -463,6 +464,11 @@ export class VirtualFileSystem {
         new RegExp(oldStr.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")
       ) || []
     ).length;
+
+    // Only replace if there are multiple occurrences to avoid accidental single replacements
+    if (occurrences <= 1) {
+      return `Error: Expected multiple occurrences but found ${occurrences} for "${oldStr}"`;
+    }
 
     // Replace all occurrences
     const updatedContent = content.split(oldStr).join(newStr || "");

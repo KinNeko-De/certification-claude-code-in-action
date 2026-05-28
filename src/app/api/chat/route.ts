@@ -16,6 +16,8 @@ export async function POST(req: Request) {
   }: { messages: any[]; files: Record<string, FileNode>; projectId?: string } =
     await req.json();
 
+  console.log("Chat request:", JSON.stringify({ messages, files, projectId }));
+
   messages.unshift({
     role: "system",
     content: generationPrompt,
@@ -65,7 +67,6 @@ export async function POST(req: Request) {
           await prisma.project.update({
             where: {
               id: projectId,
-              userId: session.userId,
             },
             data: {
               messages: JSON.stringify(allMessages),
