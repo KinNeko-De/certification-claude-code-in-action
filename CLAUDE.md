@@ -85,6 +85,55 @@ The database schema is defined in the @prisma/schema.prisma file. Reference it a
 - `src/components/editor/` — FileTree, CodeEditor (Monaco Editor)
 - `src/components/ui/` — shadcn/ui Radix primitives
 
+## Styling & CSS
+
+Use **Tailwind CSS** utility classes exclusively. No CSS modules, styled-components, or external stylesheets.
+
+```typescript
+<div className="flex flex-col h-full p-4 gap-2 bg-gray-50">
+  {/* Tailwind utilities: flex, flex-col, height, padding, gap, background */}
+</div>
+```
+
+**Why:** Consistent across the entire project, integrated with Turbopack + Next.js build pipeline, faster than runtime CSS-in-JS.
+
+Configure Tailwind in `tailwind.config.ts` for any custom values; don't inline magic numbers or colors.
+
+## Testing
+
+### File Colocation
+
+Test files live in `__tests__` subdirectories alongside source files:
+
+```
+src/lib/
+  file-system.ts
+  __tests__/
+    file-system.test.ts
+
+src/components/chat/
+  ChatInterface.tsx
+  __tests__/
+    ChatInterface.test.tsx
+```
+
+**Why:** Tests are easy to find, maintain, and run alongside their source. Discourages "test dungeon" separation.
+
+### Test Framework
+
+Use **Vitest** with `jsdom` for DOM testing. Run:
+
+```bash
+npm test                                               # Run all tests
+npm test -- src/lib/__tests__/file-system.test.ts    # Single file
+```
+
+### Patterns
+
+- Use `@testing-library/react` for component tests
+- Query by semantic role/label, not implementation details (`getByRole`, `getByLabelText`)
+- Test behavior, not implementation (what the user sees, not how the code works)
+
 ## Commenting
 
 Use comments sparingly. Only comment complex code. <!-- Vague instruction — a Claude certified architect advises against guidance like this, as Claude cannot reliably judge what counts as "complex" without concrete examples or criteria. -->
