@@ -25,10 +25,12 @@ export async function createSession(userId: string, email: string) {
     .setIssuedAt()
     .sign(JWT_SECRET);
 
+  console.log("Created session token:", token);
+
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    httpOnly: false,
+    secure: false,
     sameSite: "lax",
     expires: expiresAt,
     path: "/",
