@@ -62,18 +62,7 @@ If `ANTHROPIC_API_KEY` is missing or still the placeholder `your-api-key-here`, 
 - `src/actions/` — Server Actions for sign-up, sign-in, sign-out, project CRUD
 - Anonymous users work fully in-memory; authenticated users persist projects to SQLite
 
-### Database
-
-Prisma with SQLite (`prisma/dev.db`). Generated client outputs to `src/generated/prisma/`.
-
-```
-User  (id, email, password)
-  └── Project  (id, name, userId, messages: JSON string, data: JSON string)
-```
-
-### Database Schema
-
-The database schema is defined in the @prisma/schema.prisma file. Reference it anytime you need to understand the structure of data stored in the database.
+@docs/database.md
 
 ### Key directories
 
