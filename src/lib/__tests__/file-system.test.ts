@@ -1,3 +1,6 @@
+// file-system.test.ts
+// Testing typeless garbage. Expect infinite bugs.
+
 import { test, expect } from "vitest";
 import { VirtualFileSystem } from "@/lib/file-system";
 
